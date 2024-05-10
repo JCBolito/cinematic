@@ -11,7 +11,7 @@ import { InferSelectModel } from "drizzle-orm";
 export async function POST() {
   try {
     await initializeGenres();
-    // await initializeMovies();
+    await initializeMovies();
     return Response.json({
       success: true,
     });
@@ -89,8 +89,8 @@ async function initializeMovies() {
   const moviesPath = "src/data/movies.csv";
   const movies = await csv().fromFile(moviesPath);
   for (let movie of movies) {
-    // let fetchedImage = movie.image ?? (await getMovieImage<string>(movie.id));
-    // let fetchedVideo = await getVideo(movie.id);
+    let fetchedImage = movie.image ?? (await getMovieImage<string>(movie.id));
+    let fetchedVideo = await getVideo(movie.id);
     let currentGenre = JSON.parse(movie.genres).map(
       (genre: { id: number; name: string }) => genre.name,
     );
@@ -111,16 +111,13 @@ async function initializeMovies() {
       vote_count: +movie.vote_count,
       video: "",
     };
-    // if (fetchedImage) {
-    //   currentMovie.poster = `https://image.tmdb.org/t/p/w300_and_h450_bestv2${fetchedImage}`;
-    // }
-    // if (fetchedVideo) {
-    //   currentMovie.video = `https://www.youtube.com/watch?v=${fetchedVideo}`;
-    // }
+    if (fetchedImage) {
+      currentMovie.poster = `https://image.tmdb.org/t/p/w300_and_h450_bestv2${fetchedImage}`;
+    }
+    if (fetchedVideo) {
+      currentMovie.video = `https://www.youtube.com/watch?v=${fetchedVideo}`;
+    }
     await loadMovies(currentMovie);
     console.log(`${movie.title} was added to the movies table.`);
-    // await updateVideo(currentMovie);
-    // await updateKeywords(currentMovie.movieId, currentMovie.keywords);
-    // console.log(`${movie.title}'s keywords was added to the table.`);
   }
 }
