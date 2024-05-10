@@ -1,0 +1,4 @@
+# /pickle
+/fastText-model
+.env*
+.vercel
